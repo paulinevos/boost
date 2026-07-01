@@ -3,7 +3,7 @@
 
 ## Tools
 - Laravel Boost is an MCP server with tools designed specifically for this application. Prefer Boost tools over manual alternatives like shell commands or file reads.
-- Use `database-query` to run read-only queries against the database instead of writing raw SQL in tinker.
+- Use `database-query` to run read-only queries against the database instead of writing raw SQL or MQL in tinker.
 - Use `database-schema` to inspect table structure before writing migrations or models.
 - Use `get-absolute-url` to resolve the correct scheme, domain, and port for project URLs. Always use this before sharing a URL with the user.
 @if (config('boost.browser_logs', false) !== false || config('boost.browser_logs_watcher', true) !== false)
@@ -42,5 +42,8 @@
 - Use the `tinker` MCP tool to execute PHP code instead of the CLI. It avoids shell escaping issues and runs the snippet in the Laravel application context.
 @else
 - Always use single quotes to prevent shell expansion: `{{ $assist->artisanCommand("tinker --execute 'Your::code();'") }}`
-  - Double quotes for PHP strings inside: `{{ $assist->artisanCommand("tinker --execute 'User::where(\"active\", true)->count();'") }}`
-@endif
+- Double quotes for PHP strings inside: `{{ $assist->artisanCommand("tinker --execute 'User::where(\"active\", true)->count();'") }}`
+
+## Querying the Database
+- Connections can use different drivers (e.g. `mysql`, `pgsql`, `sqlite`, `mongodb`). If you don't already know the driver for the connection you're targeting, use the `database-connections` tool once to check before querying.
+- Use the `database-query` tool to read data directly. For SQL drivers, pass a read-only `query` argument. For the `mongodb` driver, pass a `command` argument instead (an MQL command document) — never SQL.

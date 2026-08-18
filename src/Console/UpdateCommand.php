@@ -66,6 +66,8 @@ class UpdateCommand extends Command
         }
 
         if (! $this->input->isInteractive() || $this->runningAsComposerScript()) {
+            $this->addPackages($config, $newPackages->keys()->all());
+
             return;
         }
 
@@ -80,9 +82,25 @@ class UpdateCommand extends Command
             hint: 'Select packages to include their guidelines and skills',
         );
 
-        if ($selectedPackages !== []) {
-            $config->setPackages(array_merge($config->getPackages(), $selectedPackages));
+        $this->addPackages($config, $selectedPackages);
+    }
+
+    /**
+     * Discovery that can't prompt used to return empty-handed and say nothing, so an
+     * agent running this non-interactively never picked up newly installed packages.
+     * Asking for discovery is enough of an answer: take everything found and report it.
+     *
+     * @param  array<int, string>  $packages
+     */
+    protected function addPackages(Config $config, array $packages): void
+    {
+        if ($packages === []) {
+            return;
         }
+
+        $config->setPackages(array_merge($config->getPackages(), $packages));
+
+        $this->info('Added third-party guidelines/skills: '.implode(', ', $packages).'.');
     }
 
     /**
